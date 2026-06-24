@@ -1,46 +1,79 @@
-import java.util.Scanner;
+import java.io.*;
+import java.util.*;
 
+public class Library {
 
-public class library {
-    public static void main(String[] args){
+    static final String FILE_PATH = "books.txt";
+
+    public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        int Action;
-        String book1 = "no book";
-        String book2 = "no book";
-        String book3 = "no book";
-        String book4 = "no book";
-        String book5 = "no book";
+        ArrayList<String> books = loadBooks();
+        int action;
 
-        do{
+        do {
             System.out.print("______________________________________________________\n" +
-                    "1 - Show available books\n2 - enter new book\n3 - library storage\n4- Exit\nEnter Action: ");
-            Action = sc.nextInt();
+                    "1 - Show available books\n2 - Add a book\n3 - Library storage\n4 - Exit\nEnter Action: ");
+            action = sc.nextInt();
             sc.nextLine();
-
             System.out.println("______________________________________________________");
 
-            if(Action == 1){
-                System.out.println("these are the books currently available in the library");
-                System.out.println(book1 + "\n" + book2 + "\n" + book3 + "\n" + book4 + "\n" + book5);
-            }else if(Action == 2) {
-                System.out.println("Library Storage = 5 books");
-                System.out.print("Enter book 1: ");
-                book1 = sc.nextLine();
-                System.out.print("Enter book 2: ");
-                book2 = sc.nextLine();
-                System.out.print("Enter book 3: ");
-                book3 = sc.nextLine();
-                System.out.print("Enter book 4: ");
-                book4 = sc.nextLine();
-                System.out.print("Enter book 5: ");
-                book5 = sc.nextLine();
+            if (action == 1) {
+                if (books.isEmpty()) {
+                    System.out.println("No books in the library.");
+                } else {
+                    System.out.println("Books currently in the library:");
+                    for (int i = 0; i < books.size(); i++) {
+                        System.out.println((i + 1) + ". " + books.get(i));
+                    }
+                }
 
-            }else if(Action == 3) {
-                System.out.println("Library Storage = 5 books");
-            }else if(Action == 4) {
+            } else if (action == 2) {
+                System.out.print("Enter book title: ");
+                String title = sc.nextLine();
+                books.add(title);
+                saveBooks(books);
+                System.out.println("Book added and saved.");
+
+            } else if (action == 3) {
+                System.out.println("Total books in library: " + books.size());
+
+            } else if (action == 4) {
                 System.out.println("Exiting..");
             }
-        }while(Action != 4);
+
+        } while (action != 4);
+
         sc.close();
+    }
+
+    static ArrayList<String> loadBooks() {
+        ArrayList<String> books = new ArrayList<>();
+        File file = new File(FILE_PATH);
+
+        if (!file.exists()) return books;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (!line.trim().isEmpty()) {
+                    books.add(line.trim());
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error loading books: " + e.getMessage());
+        }
+
+        return books;
+    }
+
+    static void saveBooks(ArrayList<String> books) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
+            for (String book : books) {
+                writer.write(book);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.out.println("Error saving books: " + e.getMessage());
+        }
     }
 }
